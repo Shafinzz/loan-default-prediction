@@ -265,7 +265,7 @@ Picking the cut-off is a **business decision**: it balances losing money against
 
 ### Step 5: Registering the model (`05_model_registry`)
 
-- Registered the model in the **Unity Catalog Model Registry** as **`workspace.loan_default.loan_default_gbt`** (version 1).
+- Registered the model in the **Unity Catalog Model Registry** as **`workspace.loan_default.loan_default_gbt`** (versioned; `@champion` always points to the latest version).
 - Added a full **description** (what it predicts, training data, inputs, scores).
 - Gave it the alias **`@champion`**, meaning "this is the version to use".
 - **Batch prediction test:** loaded the model **by name** and scored all **98,301** test loans in one go, straight from
