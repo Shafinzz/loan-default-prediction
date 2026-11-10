@@ -12,10 +12,10 @@
 1. [What is this project about?](#-1-what-is-this-project-about)
 2. [The problem](#-2-the-problem)
 3. [What needed to be done](#-3-what-needed-to-be-done)
-4. [What I did, step by step](#-4-what-i-did-step-by-step)
+4. [What I did, step by step](#️-4-what-i-did-step-by-step)
 5. [Final outcome](#-5-final-outcome)
-6. [How to run it](#-6-how-to-run-it)
-7. [Limitations and next steps](#-7-limitations-and-next-steps)
+6. [How to run it](#️-6-how-to-run-it)
+7. [Limitations and next steps](#️-7-limitations-and-next-steps)
 8. [What I learned](#-8-what-i-learned)
 9. [Simple glossary](#-9-simple-glossary)
 10. [Data and credit](#-10-data-and-credit)
@@ -120,10 +120,15 @@ The data has **no FICO credit score**. So the old rule ("reject if credit score 
 I replaced it with an equally simple rule using Lending Club's own **grade** (A = safest, G = riskiest).
 
 #### 📊 Patterns I found
+
+![Default rate by grade](images/default_by_grade.png)
+
 | Feature | What I found |
 |---|---|
 | **Grade** | Default rate climbs steadily: **A ≈ 6.5%**, B ≈ 13%, C ≈ 22%, D ≈ 30%, E ≈ 39%, F ≈ 45%, **G ≈ 50%**. A grade G loan is about **7× riskier** than grade A |
 | **Loan length** | **60-month** loans default about **twice as often** as 36-month loans (**~33.5% vs ~16.5%**) |
+
+![Default rate by loan term](images/default_by_term.png)
 
 #### 🧹 Data quality report (the problems I found and fixed later)
 | Problem | Example | How many | Fix |
@@ -225,6 +230,8 @@ I then retrained it on **all training years (2012–2015)** and saved it. I also
 #### 🎚️ The "strictness dial" (cut-off)
 The lender can choose how strict the model is:
 
+![Precision, recall and reject rate by cut-off](images/pr_tradeoff.png)
+
 | Cut-off | Applicants rejected | Defaults caught | Rejected loans that really defaulted |
 |---|---|---|---|
 | 0.50 | 45% | 68% | 33% |
@@ -245,6 +252,9 @@ Picking the cut-off is a **business decision**: it balances losing money against
 **same number of rejections**, which is roughly **$8M** of risky loans avoided.
 
 #### 🔑 What drives defaults (top 10)
+
+![Top 10 feature importances](images/feature_importance.png)
+
 | # | Feature | Importance |
 |---|---|---|
 | 1 | Interest rate | **21.8%** |
@@ -265,11 +275,13 @@ Picking the cut-off is a **business decision**: it balances losing money against
 
 ### Step 5: Registering the model (`05_model_registry`)
 
-- Registered the model in the **Unity Catalog Model Registry** as **`workspace.loan_default.loan_default_gbt`** (versioned; `@champion` always points to the latest version).
+- Registered the model in the **Unity Catalog Model Registry** as **`workspace.loan_default.loan_default_gbt`**
+  (versioned; `@champion` always points to the latest version).
 - Added a full **description** (what it predicts, training data, inputs, scores).
 - Gave it the alias **`@champion`**, meaning "this is the version to use".
 - **Batch prediction test:** loaded the model **by name** and scored all **98,301** test loans in one go, straight from
   **raw** application data (like `"  5.32%"` and `" 36 months"`). The result matched evaluation exactly (**AUC-ROC 0.706**).
+- **Reproducibility check:** re-ran every notebook from start to finish and got **identical results** (AUC-ROC 0.7061).
 - Wrote a **model card**: what the model is for, how well it works, its limits, and what to do before using it for real.
 
 ---
@@ -286,6 +298,7 @@ Picking the cut-off is a **business decision**: it balances losing money against
 | Test score (AUC-ROC) | **0.706** |
 | Defaults caught at a 29% reject rate | **50%** |
 | vs the simple grade rule | **wins at every level**; ~**490 more** defaulters caught per year |
+| Reproducible | ✅ a full re-run gave identical results |
 | Registered model | `workspace.loan_default.loan_default_gbt` **@champion** |
 
 ✅ All 5 project parts completed: EDA, feature engineering, training with MLflow, business evaluation, and model registry with a model card.
@@ -316,6 +329,9 @@ Picking the cut-off is a **business decision**: it balances losing money against
 - A registered model `workspace.loan_default.loan_default_gbt`
 
 The data is **already built into Databricks**, so there's nothing to download.
+
+**Note:** Databricks tables and charts (`display()`) don't render on GitHub. The key results are written in each
+notebook's notes and in this README, and the charts are shown above as images.
 
 ---
 
